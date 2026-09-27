@@ -9,9 +9,12 @@ async def scrape_website(url: str) -> str:
         
         # Line 12: Open a new tab in that invisible browser.
         page = await browser.new_page()
+        await page.set_extra_http_headers({
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        })
         
         try:
-            await page.goto(url, wait_until="networkidle", timeout=30000)
+            await page.goto(url, wait_until="domcontentloaded", timeout=30000)
             
             text_content = await page.evaluate("document.body.innerText")
             
