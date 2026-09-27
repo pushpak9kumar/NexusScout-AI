@@ -1,15 +1,15 @@
 import os
 from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq 
 
 load_dotenv()
 
 async def analyze_competitor(scraped_text: str) -> str:
     
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
-        temperature=0.3, # Low temperature (0.0 to 1.0) means the AI will be more factual and less "creative/hallucinatory".
-        google_api_key=os.getenv("GEMINI_API_KEY")
+    llm = ChatGroq(
+        model="openai/gpt-oss-20b",
+        temperature=0.7, 
+        groq_api_key=os.getenv("GROQ_API_KEY") 
     )
     
     prompt = f"""
@@ -17,11 +17,11 @@ async def analyze_competitor(scraped_text: str) -> str:
     I have scraped the following text from a competitor's website.
     
     TEXT:
-    {scraped_text[:10000]} 
-    *(Note: We limit to 10,000 characters to save time/tokens, but Gemini can handle much more!)*
+    {scraped_text[:2000]}  # <--- CHANGED FROM 10000 TO 2000 TO PREVENT CONTEXT ERRORS
     
     TASK:
     Analyze this text and provide a brief, high-level strategic summary.
+    CRITICAL: Do not just output a number or a single word. You must write a full text report.
     Format your response in Markdown with the following headers:
     ### 🎯 Core Value Proposition
     ### 💰 Pricing & Tiers (if mentioned)
