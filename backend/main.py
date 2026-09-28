@@ -1,3 +1,5 @@
+from scraper import scrape_website
+from agent import analyze_competitor
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import engine, get_db, Base
@@ -35,3 +37,20 @@ def create_competitor(competitor: schemas.CompetitorCreate, db: Session = Depend
 def read_competitors(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     competitors = db.query(models.Competitor).offset(skip).limit(limit).all()
     return competitors
+
+   # Line 1: This endpoint listens for POST requests at /scan. 
+   # It expects a simple string URL in the request body.
+   
+@app.post("/scan")
+async def scan_competitor(url: str):
+       
+       raw_text = await scrape_website(url)
+       
+       # Line 3: Error handling. If the scraper failed (e.g., site blocked us), stop and return an error.
+       if "Error" in raw_text or len(raw_text) < 100:
+           raise HTTPException(status_code=400, detail="Failed to scrape website. It might be blocking bots.")
+           
+       analysis = await analyze_competitor(raw_text)
+       
+       return {"analysis": analysis}
+
