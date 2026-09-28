@@ -17,7 +17,7 @@ export default function Home() {
   
   // New states for the AI Scanner
   const [scanningId, setScanningId] = useState<number | null>(null);
-  const [analysis, setAnalysis] = useState<string>("");
+  const [analyses, setAnalyses] = useState<Record<number, string>>({});
 
   useEffect(() => {
     fetchCompetitors();
@@ -48,10 +48,8 @@ export default function Home() {
   // NEW: The function to trigger the AI Agent
   const handleScan = async (competitor: Competitor) => {
     setScanningId(competitor.id);
-    setAnalysis(""); // Clear previous analysis
     
     try {
-      // Call our new /scan endpoint
       const res = await fetch("http://127.0.0.1:8000/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -61,9 +59,13 @@ export default function Home() {
       if (!res.ok) throw new Error("Scan failed");
       
       const data = await res.json();
-      setAnalysis(data.analysis); // Save the AI's Markdown report
+      
+      // Save the analysis specifically to this competitor's ID
+      setAnalyses(prev => ({ ...prev, [competitor.id]: data.analysis }));
+      
     } catch (error) {
-      setAnalysis("❌ Failed to scan. The website might be blocking bots.");
+      // Save the error message specifically to this competitor's ID
+      setAnalyses(prev => ({ ...prev, [competitor.id]: "❌ Failed to scan. The website might be blocking bots." }));
     } finally {
       setScanningId(null);
     }
@@ -134,15 +136,14 @@ export default function Home() {
                   </button>
                 </div>
 
-                {/* Display the AI Analysis */}
-                {analysis && scanningId !== comp.id && (
+                {/* Display the AI Analysis ONLY for this specific competitor */}
+                {analyses[comp.id] && scanningId !== comp.id && (
                   <div className="mt-4 p-4 bg-gray-900 rounded border border-purple-500/30">
                     <h4 className="text-purple-400 font-semibold mb-2 flex items-center gap-2">
                       📊 AI Intelligence Report:
                     </h4>
-                    {/* whitespace-pre-wrap preserves the Markdown line breaks perfectly */}
                     <pre className="text-gray-300 text-sm whitespace-pre-wrap font-sans leading-relaxed">
-                      {analysis}
+                      {analyses[comp.id]}
                     </pre>
                   </div>
                 )}
