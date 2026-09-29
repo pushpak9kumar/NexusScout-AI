@@ -7,6 +7,7 @@ interface Competitor {
   name: string;
   url: string;
   created_at: string;
+  analysis?: string;
 }
 
 export default function Home() {
@@ -137,16 +138,17 @@ export default function Home() {
                 </div>
 
                 {/* Display the AI Analysis ONLY for this specific competitor */}
-                {analyses[comp.id] && scanningId !== comp.id && (
+                {(comp.analysis || analyses[comp.id]) && scanningId !== comp.id && (
                   <div className="mt-4 p-4 bg-gray-900 rounded border border-purple-500/30">
-                    <h4 className="text-purple-400 font-semibold mb-2 flex items-center gap-2">
-                      📊 AI Intelligence Report:
-                    </h4>
-                    <pre className="text-gray-300 text-sm whitespace-pre-wrap font-sans leading-relaxed">
-                      {analyses[comp.id]}
-                    </pre>
+                      <h4 className="text-purple-400 font-semibold mb-2 flex items-center gap-2">
+                         📊 AI Intelligence Report:
+                      </h4>
+                      <pre className="text-gray-300 text-sm whitespace-pre-wrap font-sans leading-relaxed">
+                          {/* Show the new scan result, or fall back to the saved DB result */}
+                          {analyses[comp.id] || comp.analysis}
+                      </pre>
                   </div>
-                )}
+                 )}
               </div>
             ))
           )}
