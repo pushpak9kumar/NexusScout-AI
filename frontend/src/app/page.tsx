@@ -11,6 +11,7 @@ interface Competitor {
 }
 
 export default function Home() {
+     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
@@ -25,7 +26,7 @@ export default function Home() {
   }, []);
 
   const fetchCompetitors = async () => {
-    const res = await fetch("http://127.0.0.1:8000/competitors");
+    const res = await fetch(`${API_URL}/competitors`);
     const data = await res.json();
     setCompetitors(data);
   };
@@ -34,7 +35,7 @@ export default function Home() {
     e.preventDefault();
     setLoading(true);
     
-    await fetch("http://127.0.0.1:8000/", {
+   await fetch(`${API_URL}/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, url }),
@@ -51,7 +52,7 @@ export default function Home() {
     setScanningId(competitor.id);
     
     try {
-      const res = await fetch("http://127.0.0.1:8000/scan", {
+       const res = await fetch(`${API_URL}/scan`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: competitor.url }), 
