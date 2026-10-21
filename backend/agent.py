@@ -7,7 +7,7 @@ load_dotenv()
 async def analyze_competitor(scraped_text: str) -> str:
     
     llm = ChatGroq(
-        model="openai/gpt-oss-20b",
+        model="llama-3.1-8b-instant",
         temperature=0.7, 
         groq_api_key=os.getenv("GROQ_API_KEY") 
     )
